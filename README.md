@@ -43,7 +43,7 @@ dependencies {
 3. [Initialization/Deinitialization](https://github.com/afollestad/inquiry#initialization-deinitialization)
 4. [Querying Rows](https://github.com/afollestad/inquiry#querying-rows)
     1. [Basics](https://github.com/afollestad/inquiry#basics)
-    2. [Selection](https://github.com/afollestad/inquiry#selection)
+    2. [Where and Projection](https://github.com/afollestad/inquiry#where-and-projection)
     3. [Sorting and Limiting](https://github.com/afollestad/inquiry#sorting-and-limiting)
 5. [Inserting Rows](https://github.com/afollestad/inquiry#inserting-rows)
 6. [Updating Rows](https://github.com/afollestad/inquiry#updating-rows)
@@ -236,14 +236,14 @@ Inquiry.get()
     });
 ```
 
-#### Selection
+#### Where and Projection
 
-If you wanted to find rows with specific values in their columns, you can use selection:
+If you wanted to find rows with specific values in their columns, you can use `where` selection:
 
 ```java
 TestRow[] result = Inquiry.get()
     .selectFrom("test_table", TestRow.class)
-    .selection("name = ? AND age = ?", "Aidan Follestad", 20)
+    .where("name = ? AND age = ?", "Aidan Follestad", 20)
     .getAll();
 ```
 
@@ -254,11 +254,22 @@ vararg (or array) parameter.
 If you wanted, you could skip using the question marks and only use one parameter:
 
 ```java
-.selection("name = 'Aidan' AND age = 20");
+.where("name = 'Aidan' AND age = 20");
 ```
 
 *However*, using the question marks and filler parameters can be easier to read if you're filling them in
 with variables. Plus, this will automatically escape any strings that contain reserved SQL characters.
+
+If you only wanted certain columns in the results to be filled in, you could use projection:
+
+```java
+TestRow[] result = Inquiry.get()
+    .selectFrom("test_table", TestRow.class)
+    .projection(new String[] { "_id", "age" })
+    .getAll();
+```
+
+Make sure your `Row` class is prepared to handle non-existing columns when you use projection.
 
 #### Sorting and Limiting
 
@@ -326,7 +337,7 @@ RowValues values = new RowValues()
 
 int updatedCount = Inquiry.get()
     .update("test_table")
-    .selection("name = ?", "Aidan")
+    .where("name = ?", "Aidan")
     .values(values)
     .run();
 ```
@@ -343,7 +354,7 @@ Deletion, like updating, is simple:
 ```java
 int deletedCount = Inquiry.get()
     .deleteFrom("test_table")
-    .selection("age = ?", 20)
+    .where("age = ?", 20)
     .run();
 ```
 

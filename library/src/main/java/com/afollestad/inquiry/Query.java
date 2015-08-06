@@ -49,7 +49,7 @@ public final class Query<RowType extends Row> {
         return this;
     }
 
-    public Query<RowType> selection(@NonNull String selection, @Nullable Object... selectionArgs) {
+    public Query<RowType> where(@NonNull String selection, @Nullable Object... selectionArgs) {
         mSelection = selection;
         if (selectionArgs != null) {
             mSelectionArgs = new String[selectionArgs.length];
