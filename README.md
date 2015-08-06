@@ -104,7 +104,7 @@ public class TestTable extends Table {
 `databaseName()` is used for the database file that tables are contained in; you can have multiple
 tables inside of a database. The `tableName()` is the name of the table that you will use when querying,
 inserting, updating, and deleting. The `authority()` is used when you register your table as a content provider
-in your app's manifest. `columns()` provides a schema for the tables that are in this table.
+in your app's manifest. `columns()` provides a schema for the columns that are in this table.
 
 #### Row Schema
 
@@ -211,7 +211,7 @@ Here's how you would retrieve all rows from a table called *"test_table"*:
 
 ```java
 TestRow[] result = Inquiry.get()
-    .select("test_table", TestRow.class)
+    .selectFrom("test_table", TestRow.class)
     .getAll();
 ```
 
@@ -219,7 +219,7 @@ If you only needed one row, using `get()` instead of `getAll()` is more efficien
 
 ```java
 TestRow result = Inquiry.get()
-    .select("test_table", TestRow.class)
+    .selectFrom("test_table", TestRow.class)
     .get();
 ```
 
@@ -227,7 +227,7 @@ You can also perform the query on a separate thread using a callback:
 
 ```java
 Inquiry.get()
-    .select("test_table", TestRow.class)
+    .selectFrom("test_table", TestRow.class)
     .getAll(new GetCallback<TestRow>() {
         @Override
         public void result(TestRow[] result) {
@@ -242,7 +242,7 @@ If you wanted to find rows with specific values in their columns, you can use se
 
 ```java
 TestRow[] result = Inquiry.get()
-    .select("test_table", TestRow.class)
+    .selectFrom("test_table", TestRow.class)
     .selection("name = ? AND age = ?", "Aidan Follestad", 20)
     .getAll();
 ```
@@ -267,7 +267,7 @@ in the "name" column, in descending (Z-A, or greater to smaller) order:
 
 ```java
 TestRow[] result = Inquiry.get()
-    .select("test_table", TestRow.class)
+    .selectFrom("test_table", TestRow.class)
     .limit(100)
     .sort("name DESC")
     .getAll();
@@ -296,7 +296,7 @@ RowValues values2 = new RowValues()
     .put("rank", 8.3f);
 
 int insertedCount = Inquiry.get()
-    .insert("test_table")
+    .insertInto("test_table")
     .values(values, values2)
     .run();
 ```
@@ -342,7 +342,7 @@ Deletion, like updating, is simple:
 
 ```java
 int deletedCount = Inquiry.get()
-    .delete("test_table")
+    .deleteFrom("test_table")
     .selection("age = ?", 20)
     .run();
 ```

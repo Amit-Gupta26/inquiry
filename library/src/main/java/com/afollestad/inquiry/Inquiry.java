@@ -65,11 +65,11 @@ public final class Inquiry {
         throw new IllegalStateException("No table found by the name of " + tableName);
     }
 
-    public <RowType extends Row> Query<RowType> select(@NonNull String table, @NonNull Class<RowType> rowType) {
+    public <RowType extends Row> Query<RowType> selectFrom(@NonNull String table, @NonNull Class<RowType> rowType) {
         return new Query<>(this, findTableUri(table), Query.SELECT, rowType);
     }
 
-    public Query<?> insert(@NonNull String table) {
+    public Query<?> insertInto(@NonNull String table) {
         return new Query<>(this, findTableUri(table), Query.INSERT, null);
     }
 
@@ -77,7 +77,7 @@ public final class Inquiry {
         return new Query<>(this, findTableUri(table), Query.UPDATE, null);
     }
 
-    public Query<?> delete(@NonNull String table) {
+    public Query<?> deleteFrom(@NonNull String table) {
         return new Query<>(this, findTableUri(table), Query.DELETE, null);
     }
 }
