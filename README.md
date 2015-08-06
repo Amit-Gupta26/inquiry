@@ -343,7 +343,7 @@ int updatedCount = Inquiry.get()
 ```
 
 The above code updates the name column to *"New Name"* in any column which currently has their name set
-to *"Aidan"*. If you didn't specify `selection()` args, every row in the table would be updated.
+to *"Aidan"*. If you didn't specify `where()` args, every row in the table would be updated.
 
 *Don't forget to call `run()` at the end!*
 
@@ -359,7 +359,7 @@ int deletedCount = Inquiry.get()
 ```
 
 The above code results in any rows with their age column set to *20* to be deleted. If you didn't
-specify `selection()` args, every row in the table would be deleted.
+specify `where()` args, every row in the table would be deleted.
 
 *Don't forget to call `run()` at the end!*
 
