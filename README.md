@@ -1,7 +1,7 @@
 # Inquiry
 
 Inquiry is a simple library for Android that simplifies construction and use of SQL content providers.
-**You should understand SQLite before using this library; I will not answer fundamental questions about SQL.**
+*You should understand SQLite before using this library; I will not answer fundamental questions about SQL.*
 
 ### What's a Content Provider?
 
@@ -319,10 +319,13 @@ The `RowValues` objects contains key-value pairs, the key being the column name 
 **Note**: like `getAll()`, `run()` has a callback variation that will run the operation in a separate thread:
 
 ```java
-...
+Inquiry.get()
+    .insertInto("test_table")
+    .values(values, values2)
     .run(new RunCallback() {
         @Override
         public void result(int changedCount) {
+            // Do something
         }
     });
 ```
