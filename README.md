@@ -36,7 +36,7 @@ Then, add Inquiry to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:inquiry:0.1.1'
+    compile 'com.afollestad:inquiry:0.1.2'
 }
 ```
 
@@ -120,7 +120,7 @@ in your app's manifest. `columns()` provides a schema for the columns that are i
 
 If you understand SQL or a spreadsheet, you should know what a row is.
 
-Row implementations are simple, you just need to override `load(Cursor)` which is invoked by the library
+Row implementations are simple, you just need to override `load(RawRow)` which is invoked by the library
 when it loads the result of a query into an array of `Row` objects.
 
 ```java
@@ -131,18 +131,10 @@ public class TestRow extends Row {
     public float rank;
 
     @Override
-    public void load(@NonNull Cursor cursor) {
-        int idIndex = cursor.getColumnIndex("_id");
-        if (idIndex > -1)
-            id = cursor.getLong(idIndex);
-
-        int nameIndex = cursor.getColumnIndex("name");
-        if (nameIndex > -1)
-            name = cursor.getString(nameIndex);
-
-        int rankIndex = cursor.getColumnIndex("rank");
-        if (rankIndex > -1)
-            rank = cursor.getFloat(rankIndex);
+    public void load(@NonNull RawRow row) {
+        id = row.getLong("id");
+        name = row.getString("name");
+        rank = row.getFloat("rank");
     }
 }
 ```

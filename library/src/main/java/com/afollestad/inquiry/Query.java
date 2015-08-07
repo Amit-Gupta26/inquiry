@@ -90,15 +90,17 @@ public final class Query<RowType extends Row> {
                     final Constructor ctor = Util.getDefaultConstructor(mRowClass);
                     results = (RowType[]) Array.newInstance(mRowClass, cursor.getCount());
                     int index = 0;
+                    final RawRow rawRow = new RawRow(cursor);
                     while (cursor.moveToNext()) {
                         try {
                             results[index] = (RowType) ctor.newInstance();
-                            results[index].load(cursor);
+                            results[index].load(rawRow);
                         } catch (Throwable t) {
                             throw new RuntimeException("Failed to instantiate " + mRowClass.getName() + ": " + t.getLocalizedMessage());
                         }
                         index++;
                     }
+                    rawRow.denit();
                 }
                 cursor.close();
                 return results;
