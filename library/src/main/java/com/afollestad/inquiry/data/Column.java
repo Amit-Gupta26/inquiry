@@ -38,7 +38,7 @@ public class Column {
     public String toString() {
         StringBuilder sb = new StringBuilder(mName);
         sb.append(" ");
-        sb.append(mType.name());
+        sb.append(mType.getValue());
         if (mPrimaryKey)
             sb.append(" PRIMARY KEY");
         if (mAutoIncrement)
