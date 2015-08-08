@@ -6,6 +6,8 @@ package com.afollestad.inquiry.data;
 public enum DataType {
     /**
      * The value is a signed integer, stored in 1, 2, 3, 4, 6, or 8 bytes depending on the magnitude of the value.
+     * <p/>
+     * Translates to short, int, or long in Java (based on what was stored in the column).
      */
     INTEGER("INTEGER"),
     /**
