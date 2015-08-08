@@ -93,7 +93,6 @@ public final class RawRow {
     }
 
     protected void denit() {
-        mCursor.close();
         mCursor = null;
     }
 }
