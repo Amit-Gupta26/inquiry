@@ -71,12 +71,13 @@ public final class Query<RowType extends Row> {
         return this;
     }
 
-    public Query<RowType> values(RowValues... values) {
+    public Query<RowType> values(@NonNull RowValues... values) {
         mValues = values;
         return this;
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     private RowType[] getInternal(int limit) {
         if (mRowClass == null) return null;
         final ContentResolver cr = mInquiry.mContext.getContentResolver();
@@ -109,6 +110,7 @@ public final class Query<RowType extends Row> {
         return null;
     }
 
+    @Nullable
     public RowType get() {
         if (mRowClass == null) return null;
         RowType[] results = getInternal(1);
@@ -117,6 +119,7 @@ public final class Query<RowType extends Row> {
         return results[0];
     }
 
+    @Nullable
     public RowType[] getAll() {
         return getInternal(mLimit > 0 ? mLimit : -1);
     }

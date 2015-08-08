@@ -23,6 +23,7 @@ public final class Inquiry {
     }
 
     @SafeVarargs
+    @NonNull
     public static Inquiry init(@NonNull Context context, @NonNull Class<? extends Table>... tables) {
         //noinspection ConstantConditions
         if (context == null || tables == null)
@@ -48,6 +49,7 @@ public final class Inquiry {
                 .getWritableDatabase().execSQL("DROP TABLE IF EXISTS " + tableName);
     }
 
+    @NonNull
     public static Inquiry get() {
         if (mInquiry == null)
             throw new IllegalStateException("Inquiry not initialized, or has been garbage collected.");
@@ -65,18 +67,22 @@ public final class Inquiry {
         throw new IllegalStateException("No table found by the name of " + tableName);
     }
 
+    @NonNull
     public <RowType extends Row> Query<RowType> selectFrom(@NonNull String table, @NonNull Class<RowType> rowType) {
         return new Query<>(this, findTableUri(table), Query.SELECT, rowType);
     }
 
+    @NonNull
     public Query<?> insertInto(@NonNull String table) {
         return new Query<>(this, findTableUri(table), Query.INSERT, null);
     }
 
+    @NonNull
     public Query<?> update(@NonNull String table) {
         return new Query<>(this, findTableUri(table), Query.UPDATE, null);
     }
 
+    @NonNull
     public Query<?> deleteFrom(@NonNull String table) {
         return new Query<>(this, findTableUri(table), Query.DELETE, null);
     }

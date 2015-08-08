@@ -14,21 +14,36 @@ public class Column {
     private boolean mAutoIncrement;
     private boolean mNotNull;
 
-    public Column(String name, DataType type) {
+    public Column(@NonNull String name, @NonNull DataType type) {
+        //noinspection ConstantConditions
+        if (name == null || type == null)
+            throw new IllegalStateException("Name and type cannot be null.");
         mName = name;
         mType = type;
     }
 
+    /**
+     * Adds a constraint to this column indicating that the value can never be null.
+     */
     public Column notNull() {
         mNotNull = true;
         return this;
     }
 
+    /**
+     * Adds a constraint to this column, indicating it's the primary column.
+     * <p/>
+     * This is commonly used for a column that is an identifier for its row, like a user ID.
+     */
     public Column primaryKey() {
         mPrimaryKey = true;
         return this;
     }
 
+    /**
+     * Used with INTEGER columns. Every time you insert a row, this column is incremented by one;
+     * you don't manually set the value, the database does it for you.
+     */
     public Column autoIncrement() {
         mAutoIncrement = true;
         return this;

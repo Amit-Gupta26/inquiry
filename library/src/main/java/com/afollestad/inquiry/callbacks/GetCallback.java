@@ -1,5 +1,7 @@
 package com.afollestad.inquiry.callbacks;
 
+import android.support.annotation.Nullable;
+
 import com.afollestad.inquiry.data.Row;
 
 /**
@@ -7,5 +9,5 @@ import com.afollestad.inquiry.data.Row;
  */
 public interface GetCallback<RowType extends Row> {
 
-    void result(RowType[] result);
+    void result(@Nullable RowType[] result);
 }
