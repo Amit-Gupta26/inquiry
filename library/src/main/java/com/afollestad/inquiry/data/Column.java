@@ -1,23 +1,33 @@
 package com.afollestad.inquiry.data;
 
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
 public class Column {
 
+    @IntDef({DataType.INTEGER, DataType.BOOLEAN, DataType.TEXT, DataType.REAL, DataType.BLOB})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface DataTypeInt {
+    }
+
     private final String mName;
-    private final DataType mType;
+    @DataTypeInt
+    private final int mType;
 
     private boolean mPrimaryKey;
     private boolean mAutoIncrement;
     private boolean mNotNull;
 
-    public Column(@NonNull String name, @NonNull DataType type) {
+    public Column(@NonNull String name, @DataTypeInt int type) {
         //noinspection ConstantConditions
-        if (name == null || type == null)
-            throw new IllegalStateException("Name and type cannot be null.");
+        if (name == null)
+            throw new IllegalStateException("Name cannot be null.");
         mName = name;
         mType = type;
     }
@@ -53,7 +63,7 @@ public class Column {
     public String toString() {
         StringBuilder sb = new StringBuilder(mName);
         sb.append(" ");
-        sb.append(mType.getValue());
+        sb.append(DataType.name(mType));
         if (mPrimaryKey)
             sb.append(" PRIMARY KEY");
         if (mAutoIncrement)
