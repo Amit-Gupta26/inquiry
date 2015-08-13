@@ -1,18 +1,22 @@
 package com.afollestad.inquiry;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 /**
  * @author Aidan Follestad (afollestad)
  */
-class Util {
+class Utils {
 
-    public static Object newInstance(@NonNull Class<?> cls) {
+    @SuppressWarnings("unchecked")
+    public static <T> T newInstance(@NonNull Class<T> cls) {
         final Constructor ctor = getDefaultConstructor(cls);
         try {
-            return ctor.newInstance();
+            return (T) ctor.newInstance();
         } catch (Throwable t) {
             t.printStackTrace();
             throw new RuntimeException("Failed to instantiate " + cls.getName() + ": " + t.getLocalizedMessage());
@@ -31,5 +35,14 @@ class Util {
             throw new IllegalStateException("No default constructor found for " + cls.getName());
         ctor.setAccessible(true);
         return ctor;
+    }
+
+    public static void closeQuietely(@Nullable Closeable c) {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (IOException ignored) {
+            }
+        }
     }
 }

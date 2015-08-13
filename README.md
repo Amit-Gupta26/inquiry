@@ -36,7 +36,7 @@ Then, add Inquiry to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:inquiry:0.1.5'
+    compile 'com.afollestad:inquiry:1.0.0'
 }
 ```
 
@@ -46,133 +46,20 @@ dependencies {
 
 # Table of Contents
 
-1. [Pre-setup](https://github.com/afollestad/inquiry#pre-setup)
-    1. [Table Schema](https://github.com/afollestad/inquiry#table-schema)
-    2. [Row Schema](https://github.com/afollestad/inquiry#row-schema)
-    3. [Registering Tables in the Manifest](https://github.com/afollestad/inquiry#registering-tables-in-the-manifest)
-3. [Initialization/Deinitialization](https://github.com/afollestad/inquiry#initialization-deinitialization)
-4. [Querying Rows](https://github.com/afollestad/inquiry#querying-rows)
+1. [Quick Setup](https://github.com/afollestad/inquiry#quick-setup)
+2. [Example Row](https://github.com/afollestad/inquiry#example-row)
+3. [Querying Rows](https://github.com/afollestad/inquiry#querying-rows)
     1. [Basics](https://github.com/afollestad/inquiry#basics)
     2. [Where and Projection](https://github.com/afollestad/inquiry#where-and-projection)
     3. [Sorting and Limiting](https://github.com/afollestad/inquiry#sorting-and-limiting)
-5. [Inserting Rows](https://github.com/afollestad/inquiry#inserting-rows)
-6. [Updating Rows](https://github.com/afollestad/inquiry#updating-rows)
-7. [Deleting Rows](https://github.com/afollestad/inquiry#deleting-rows)
-8. [Dropping Tables](https://github.com/afollestad/inquiry#dropping-tables)
+4. [Inserting Rows](https://github.com/afollestad/inquiry#inserting-rows)
+5. [Updating Rows](https://github.com/afollestad/inquiry#updating-rows)
+6. [Deleting Rows](https://github.com/afollestad/inquiry#deleting-rows)
+7. [Dropping Tables](https://github.com/afollestad/inquiry#dropping-tables)
 
 ---
 
-# Pre-setup
-
-Before you can initialize Inquiry, you'll need something to initialize with. Inquiry needs to know
-what your database tables look like, and what they hold.
-
-#### Table Schema
-
-A table is like a spreadsheet. It contains rows, each row has columns that separate values with their own data types.
-
-Here's an example table:
-
-```java
-public class TestTable extends Table {
-
-    @NonNull
-    @Override
-    public String databaseName() {
-        return "test_database";
-    }
-
-    @NonNull
-    @Override
-    public String tableName() {
-        return "test_table";
-    }
-
-    @NonNull
-    @Override
-    public String authority() {
-        // This will match a value in your manifest, discussed below
-        return "com.myapp.testtable";
-    }
-
-    @NonNull
-    @Override
-    public Column[] columns() {
-        return new Column[]{
-                new Column("_id", DataType.INTEGER)
-                        .autoIncrement()
-                        .primaryKey()
-                        .notNull(),
-                new Column("name", DataType.TEXT),
-                new Column("age", DataType.INTEGER),
-                new Column("rank", DataType.REAL)
-        };
-    }
-}
-```
-
-`databaseName()` is used for the database file that tables are contained in; you can have multiple
-tables inside of a database. The `tableName()` is the name of the table that you will use when querying,
-inserting, updating, and deleting. The `authority()` is used when you register your table as a content provider
-in your app's manifest. `columns()` provides a schema for the columns that are in this table.
-
-#### Row Schema
-
-If you understand SQL or a spreadsheet, you should know what a row is.
-
-Row implementations are simple, you just need to override `load(RawRow)` which is invoked by the library
-when it loads the result of a query into an array of `Row` objects.
-
-```java
-public class TestRow extends Row {
-
-    public long id = -1;
-    public String name;
-    public float rank;
-
-    @Override
-    public void load(@NonNull RawRow row) {
-        id = row.getLong("id");
-        name = row.getString("name");
-        rank = row.getFloat("rank");
-    }
-}
-```
-
-#### Registering Tables in the Manifest
-
-A `Table` is indirectly a Content Provider. You must register all of your table classes in your app's
-`AndroidManifest.xml` file:
-
-```xml
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.myapp.putpackagehere">
-
-    <application
-        android:name=".App"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme">
-
-        ...
-
-        <!-- Set exported to true to allow access from other apps -->
-        <provider
-            android:name=".TestTable"
-            android:authorities="com.myapp.testtable"
-            android:exported="false" />
-
-    </application>
-
-</manifest>
-```
-
-The name attribute points to your Java class. The authority should match what you return for `authority()`
-in your table implementation.
-
----
-
-# Initialization/Deinitialization
+# Quick Setup
 
 When your app starts, you need to initialize Inquiry. You can do so from an `Application` class,
 which must be registered in your manifest. You could also put this inside of `onCreate()` in your
@@ -184,7 +71,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Inquiry.init(this, TestTable.class);
+        Inquiry.init(this, "myDatabase);
     }
 
     @Override
@@ -195,63 +82,113 @@ public class App extends Application {
 }
 ```
 
-`init()` takes a `Context` in the first parameter. After that, you list all table classes that your app will use,
-separated by commas. You could have multiple tables registered like this:
-
-```java
-Inquiry.init(this, TableOne.class, TableTwo.class, TableThree.class);
-```
+`init()` takes a `Context` in the first parameter, and the name of the database that'll you be using
+in the second parameter. Think of a database like a file that contains a set of tables (a table is basically
+a spreadsheet; it contains rows and columns).
 
 When your app is done with Inquiry, you *should* call `deinit()` to help clean up references.
+
+---
+
+# Example Row
+
+In Inquiry, a row is just an object which contains a set of values that can be read from and written to
+a table in your database.
+
+```java
+public class Person {
+
+    public Person() {
+        // Default constructor is needed so Inquiry can auto construct instances
+    }
+
+    public Person(String name, int age, float rank, boolean admin) {
+        this.name = name;
+        this.age = age;
+        this.rank = rank;
+        this.admin = admin;
+    }
+
+    @Column(primaryKey = true, notNull = true, autoIncrement = true)
+    public long _id;
+    @Column
+    public String name;
+    @Column
+    public int age;
+    @Column
+    public float rank;
+    @Column
+    public boolean admin;
+}
+```
+
+Notice that all the fields are annotated with the `@Column` annotation. If you have fields without that
+annotation, they will be ignored by Inquiry.
+
+Notice that the `_id` field contains optional parameters in its annotation:
+
+* `primaryKey` indicates its column is the main column used to identity the row. No other row in the
+table can have the same value for that column. This is commonly used with IDs.
+* `notNull` indicates that you can never insert null as a value for that column.
+* `autoIncrement` indicates that you don't need to manually set the value of this column. Every time
+you insert a row into the table, this column will be incremented by one automatically.
+
+---
 
 # Querying Rows
 
 #### Basics
 
 Querying retrieves rows, whether its every row in a table or rows that match a specific criteria.
-Here's how you would retrieve all rows from a table called *"test_table"*:
+Here's how you would retrieve all rows from a table called *"people"*:
 
 ```java
-TestRow[] result = Inquiry.get()
-    .selectFrom("test_table", TestRow.class)
+Person[] result = Inquiry.get()
+    .selectFrom("people", Person.class)
     .getAll();
 ```
 
 If you only needed one row, using `get()` instead of `getAll()` is more efficient:
 
 ```java
-TestRow result = Inquiry.get()
-    .selectFrom("test_table", TestRow.class)
+Person result = Inquiry.get()
+    .selectFrom("people", Person.class)
     .get();
 ```
+
+---
 
 You can also perform the query on a separate thread using a callback:
 
 ```java
 Inquiry.get()
-    .selectFrom("test_table", TestRow.class)
-    .getAll(new GetCallback<TestRow>() {
+    .selectFrom("people", Person.class)
+    .getAll(new GetCallback<Person>() {
         @Override
-        public void result(TestRow[] result) {
+        public void result(Person[] result) {
             // Do something with result
         }
     });
 ```
+
+Inquiry will automatically fill in your `@Column` fields with matching columns in each row of the table.
 
 #### Where and Projection
 
 If you wanted to find rows with specific values in their columns, you can use `where` selection:
 
 ```java
-TestRow[] result = Inquiry.get()
-    .selectFrom("test_table", TestRow.class)
-    .where("name = ? AND age = ?", "Aidan Follestad", 20)
+Person[] result = Inquiry.get()
+    .selectFrom("people", Person.class)
+    .where("name = ? AND age = ?", "Aidan", 20)
     .getAll();
 ```
 
 The first parameter is a string, specifying two conditions that must be true (`AND` is used instead of `OR`).
 The question marks are placeholders, which are replaced by the values you specify in the second comma-separated
 vararg (or array) parameter.
+
+---
 
 If you wanted, you could skip using the question marks and only use one parameter:
 
@@ -265,13 +202,14 @@ with variables. Plus, this will automatically escape any strings that contain re
 If you only wanted certain columns in the results to be filled in, you could use projection:
 
 ```java
-TestRow[] result = Inquiry.get()
-    .selectFrom("test_table", TestRow.class)
+Person[] result = Inquiry.get()
+    .selectFrom("people", Person.class)
     .projection(new String[] { "_id", "age" })
     .getAll();
 ```
 
-Make sure your `Row` class is prepared to handle non-existing columns when you use projection.
+Fields not included in projection will be set to their default values (e.g. null for objects,
+0 for numbers, false for booleans, etc.).
 
 #### Sorting and Limiting
 
@@ -279,8 +217,8 @@ This code would limit the maximum number of rows returned to 100. It would sort 
 in the "name" column, in descending (Z-A, or greater to smaller) order:
 
 ```java
-TestRow[] result = Inquiry.get()
-    .selectFrom("test_table", TestRow.class)
+Person[] result = Inquiry.get()
+    .selectFrom("people", Person.class)
     .limit(100)
     .sort("name DESC")
     .getAll();
@@ -296,37 +234,30 @@ The above sort value would sort every column by name descending (large to small,
 
 # Inserting Rows
 
-Insertion is pretty straight forward. This inserts two rows into the table *"test_table"*:
+Insertion is pretty straight forward. This inserts three `People` into the table *"people"*:
 
 ```java
-RowValues values = new RowValues()
-    .put("name", "Aidan")
-    .put("age", 20)
-    .put("rank", 2.5f);
-RowValues values2 = new RowValues()
-    .put("name", "Waverly")
-    .put("age", 18)
-    .put("rank", 8.3f);
+Person one = new Person("Waverly", 18, 8.9f, false);
+Person two = new Person("Natalie", 42, 10f, false);
+Person three = new Person("Aidan", 20, 5.7f, true);
 
-int insertedCount = Inquiry.get()
-    .insertInto("test_table")
-    .values(values, values2)
-    .run();
+long insertedCount = Inquiry.get()
+        .insertInto("people", Person.class)
+        .values(one, two, three)
+        .run();
 ```
 
-The `RowValues` objects contains key-value pairs, the key being the column name from the table you're inserting into.
+Inquiry will automatically pull your `@Column` fields out and insert them into the table `people`.
 
-*Don't forget to call `run()` at the end!*
-
-**Note**: like `getAll()`, `run()` has a callback variation that will run the operation in a separate thread:
+Like `getAll()`, `run()` has a callback variation that will run the operation in a separate thread:
 
 ```java
 Inquiry.get()
-    .insertInto("test_table")
-    .values(values, values2)
+    .insertInto("people", Person.class)
+    .values(one, two, three)
     .run(new RunCallback() {
         @Override
-        public void result(int changedCount) {
+        public void result(long changedCount) {
             // Do something
         }
     });
@@ -334,39 +265,34 @@ Inquiry.get()
 
 # Updating Rows
 
-Updating is similar to selection, however it results in changes rather than retrieving rows:
+Updating is similar to insertion, however it results in changed rows rather than new rows:
 
 ```java
-RowValues values = new RowValues()
-    .put("name", "New Name");
+Person two = new Person("Natalie", 42, 10f, false);
 
-int updatedCount = Inquiry.get()
-    .update("test_table")
+long updatedCount = Inquiry.get()
+    .update("people", Person.class)
+    .values(two)
     .where("name = ?", "Aidan")
-    .values(values)
     .run();
 ```
 
-The above code updates the name column to *"New Name"* in any column which currently has their name set
-to *"Aidan"*. If you didn't specify `where()` args, every row in the table would be updated.
-
-*Don't forget to call `run()` at the end!*
+The above will update all rows whose name is equal to *"Aidan"*, setting all columns to the values in the `Person`
+object called `two`. If you didn't specify `where()` args, every row in the table would be updated.
 
 # Deleting Rows
 
-Deletion, like updating, is simple:
+Deletion is simple:
 
 ```java
 int deletedCount = Inquiry.get()
-    .deleteFrom("test_table")
+    .deleteFrom("people")
     .where("age = ?", 20)
     .run();
 ```
 
-The above code results in any rows with their age column set to *20* to be deleted. If you didn't
+The above code results in any rows with their age column set to *20* removed. If you didn't
 specify `where()` args, every row in the table would be deleted.
-
-*Don't forget to call `run()` at the end!*
 
 # Dropping Tables
 
@@ -374,7 +300,7 @@ Dropping a table means deleting it. It's pretty straight forward:
 
 ```java
 Inquiry.get()
-    .dropTable("test_database", "test_table");
+    .dropTable("people");
 ```
 
-Just pass the database and table names, and it's gone.
+Just pass table name, and it's gone.

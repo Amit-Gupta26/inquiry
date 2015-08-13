@@ -5,5 +5,5 @@ package com.afollestad.inquiry.callbacks;
  */
 public interface RunCallback {
 
-    void result(int changed);
+    void result(long changed);
 }
