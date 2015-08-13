@@ -194,12 +194,22 @@ class ClassRowConverter {
         return row;
     }
 
-    public static ContentValues clsToVals(Object row) {
+    public static ContentValues clsToVals(Object row, @Nullable String[] projection) {
         try {
             ContentValues vals = new ContentValues();
             Field[] fields = row.getClass().getDeclaredFields();
             int columnCount = 0;
             for (Field fld : fields) {
+                if (projection != null && projection.length > 0) {
+                    boolean skip = true;
+                    for (String proj : projection) {
+                        if (proj != null && proj.equalsIgnoreCase(fld.getName())) {
+                            skip = false;
+                            break;
+                        }
+                    }
+                    if (skip) continue;
+                }
                 Column colAnn = fld.getAnnotation(Column.class);
                 if (colAnn == null) continue;
                 columnCount++;

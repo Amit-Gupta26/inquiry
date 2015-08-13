@@ -135,10 +135,10 @@ public final class Query<RowType> {
             case INSERT:
                 long inserted = 0;
                 for (Object val : mValues)
-                    inserted += mDatabase.insert(ClassRowConverter.clsToVals(val));
+                    inserted += mDatabase.insert(ClassRowConverter.clsToVals(val, null));
                 return inserted;
             case UPDATE:
-                return mDatabase.update(ClassRowConverter.clsToVals(mValues[mValues.length - 1]),
+                return mDatabase.update(ClassRowConverter.clsToVals(mValues[mValues.length - 1], mProjection),
                         mSelection, mSelectionArgs);
             case DELETE:
                 return mDatabase.delete(mSelection, mSelectionArgs);

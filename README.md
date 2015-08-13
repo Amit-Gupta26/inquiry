@@ -20,7 +20,7 @@ Then, add Inquiry to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:inquiry:1.0.0'
+    compile 'com.afollestad:inquiry:1.0.1'
 }
 ```
 
@@ -38,6 +38,8 @@ dependencies {
     3. [Sorting and Limiting](https://github.com/afollestad/inquiry#sorting-and-limiting)
 4. [Inserting Rows](https://github.com/afollestad/inquiry#inserting-rows)
 5. [Updating Rows](https://github.com/afollestad/inquiry#updating-rows)
+    1. [Basics](https://github.com/afollestad/inquiry#basics-1)
+    2. [Projection](https://github.com/afollestad/inquiry#projection)
 6. [Deleting Rows](https://github.com/afollestad/inquiry#deleting-rows)
 7. [Dropping Tables](https://github.com/afollestad/inquiry#dropping-tables)
 
@@ -242,13 +244,15 @@ Inquiry.get()
     .values(one, two, three)
     .run(new RunCallback() {
         @Override
-        public void result(long changedCount) {
+        public void result(long insertedCount) {
             // Do something
         }
     });
 ```
 
 # Updating Rows
+
+#### Basics
 
 Updating is similar to insertion, however it results in changed rows rather than new rows:
 
@@ -264,6 +268,25 @@ long updatedCount = Inquiry.get()
 
 The above will update all rows whose name is equal to *"Aidan"*, setting all columns to the values in the `Person`
 object called `two`. If you didn't specify `where()` args, every row in the table would be updated.
+
+#### Projection
+
+Sometimes, you don't want to change every column in a row when you update them. You can choose specifically
+what columns you want to be changed using projection:
+
+```java
+Person two = new Person("Natalie", 42, 10f, false);
+
+long updatedCount = Inquiry.get()
+    .update("people", Person.class)
+    .values(two)
+    .where("name = ?", "Aidan")
+    .projection(new String[] { "age", "rank" })
+    .run();
+```
+
+The above code will update any rows with their name equal to *"Aidan"*, however it will only modify
+the `age` and `rank` columns of the updated rows. The other columns will be left alone.
 
 # Deleting Rows
 
