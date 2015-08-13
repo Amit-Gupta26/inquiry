@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.afollestad.inquiry.annotations.Column;
@@ -194,7 +195,14 @@ class ClassRowConverter {
         return row;
     }
 
-    public static ContentValues clsToVals(Object row, @Nullable String[] projection) {
+    public static ContentValues[] clsArrayToVals(@NonNull Object[] rows, @Nullable String[] projection) {
+        ContentValues[] vals = new ContentValues[rows.length];
+        for (int i = 0; i < rows.length; i++)
+            vals[i] = clsToVals(rows[i], projection);
+        return vals;
+    }
+
+    public static ContentValues clsToVals(@NonNull Object row, @Nullable String[] projection) {
         try {
             ContentValues vals = new ContentValues();
             Field[] fields = row.getClass().getDeclaredFields();

@@ -20,7 +20,7 @@ Then, add Inquiry to your dependencies list:
 
 ```gradle
 dependencies {
-    compile 'com.afollestad:inquiry:1.0.1'
+    compile 'com.afollestad:inquiry:1.1.0'
 }
 ```
 
@@ -42,6 +42,9 @@ dependencies {
     2. [Projection](https://github.com/afollestad/inquiry#projection)
 6. [Deleting Rows](https://github.com/afollestad/inquiry#deleting-rows)
 7. [Dropping Tables](https://github.com/afollestad/inquiry#dropping-tables)
+8. [Extra: Accessing Content Providers](https://github.com/afollestad/inquiry#extra-accessing-content-providers)
+    1. [Initialization](https://github.com/afollestad/inquiry#initialization)
+    2. [Basics](https://github.com/afollestad/inquiry#basics-2)
 
 ---
 
@@ -132,15 +135,15 @@ Here's how you would retrieve all rows from a table called *"people"*:
 ```java
 Person[] result = Inquiry.get()
     .selectFrom("people", Person.class)
-    .getAll();
+    .all();
 ```
 
-If you only needed one row, using `get()` instead of `getAll()` is more efficient:
+If you only needed one row, using `one()` instead of `all()` is more efficient:
 
 ```java
 Person result = Inquiry.get()
     .selectFrom("people", Person.class)
-    .get();
+    .one();
 ```
 
 ---
@@ -150,7 +153,7 @@ You can also perform the query on a separate thread using a callback:
 ```java
 Inquiry.get()
     .selectFrom("people", Person.class)
-    .getAll(new GetCallback<Person>() {
+    .all(new GetCallback<Person>() {
         @Override
         public void result(Person[] result) {
             // Do something with result
@@ -168,7 +171,7 @@ If you wanted to find rows with specific values in their columns, you can use `w
 Person[] result = Inquiry.get()
     .selectFrom("people", Person.class)
     .where("name = ? AND age = ?", "Aidan", 20)
-    .getAll();
+    .all();
 ```
 
 The first parameter is a string, specifying two conditions that must be true (`AND` is used instead of `OR`).
@@ -192,7 +195,7 @@ If you only wanted certain columns in the results to be filled in, you could use
 Person[] result = Inquiry.get()
     .selectFrom("people", Person.class)
     .projection(new String[] { "_id", "age" })
-    .getAll();
+    .all();
 ```
 
 Fields not included in projection will be set to their default values (e.g. null for objects,
@@ -208,7 +211,7 @@ Person[] result = Inquiry.get()
     .selectFrom("people", Person.class)
     .limit(100)
     .sort("name DESC")
-    .getAll();
+    .all();
 ```
 
 If you understand SQL, you'll know you can specify multiple sort parameters separated by commas.
@@ -312,3 +315,68 @@ Inquiry.get()
 ```
 
 Just pass table name, and it's gone.
+
+---
+
+# Extra: Accessing Content Providers
+
+Inquiry allows you to access content providers, which are basically external databases used in other apps.
+A common usage of content providers is Android's MediaStore. Most local media players use content providers
+to get a list of audio and video files scanned by the system; the system logs all of their meta data
+so the title, duration, album art, etc. can be quickly accessed.
+
+#### Initialization
+
+Inquiry initialization is still the same, but passing a database name is not required for content providers.
+
+```java
+public class App extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Inquiry.init(this);
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        Inquiry.deinit();
+    }
+}
+```
+
+#### Basics
+
+This small example will read artists (for songs) on your phone. Here's the row class:
+
+```java
+public class Artist {
+
+    public Artist() {
+    }
+
+    @Column
+    public long _id;
+    @Column
+    public String artist;
+    @Column
+    public String artist_key;
+    @Column
+    public int number_of_albums;
+    @Column
+    public int number_of_tracks;
+}
+```
+
+You can perform all the same operations, but you pass a `content://` URI instead of a table name:
+
+```java
+Uri artistsUri = Uri.parse("content://media/internal/audio/artists");
+
+Artist[] artists = Inquiry.get()
+    .selectFrom(artistsUri, Artist.class)
+    .all();
+```
+
+Insert, update, and delete work the same way. Just pass that URI.

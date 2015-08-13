@@ -1,8 +1,10 @@
 package com.afollestad.inquiry;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -13,6 +15,7 @@ public final class Inquiry {
 
     protected Context mContext;
     protected Handler mHandler;
+    @Nullable
     protected String mDatabaseName;
 
     private Inquiry() {
@@ -20,7 +23,7 @@ public final class Inquiry {
     }
 
     @NonNull
-    public static Inquiry init(@NonNull Context context, @NonNull String databaseName) {
+    public static Inquiry init(@NonNull Context context, @Nullable String databaseName) {
         //noinspection ConstantConditions
         if (context == null)
             throw new IllegalArgumentException("Context can't be null.");
@@ -29,6 +32,11 @@ public final class Inquiry {
         mInquiry.mContext = context;
         mInquiry.mDatabaseName = databaseName;
         return mInquiry;
+    }
+
+    @NonNull
+    public static Inquiry init(@NonNull Context context) {
+        return init(context, null);
     }
 
     public static void deinit() {
@@ -58,8 +66,18 @@ public final class Inquiry {
     }
 
     @NonNull
+    public <RowType> Query<RowType> selectFrom(@NonNull Uri contentProviderUri, @NonNull Class<RowType> rowType) {
+        return new Query<>(this, contentProviderUri, Query.SELECT, rowType);
+    }
+
+    @NonNull
     public <RowType> Query<RowType> insertInto(@NonNull String table, @NonNull Class<RowType> rowType) {
         return new Query<>(this, table, Query.INSERT, rowType);
+    }
+
+    @NonNull
+    public <RowType> Query<RowType> insertInto(@NonNull Uri contentProviderUri, @NonNull Class<RowType> rowType) {
+        return new Query<>(this, contentProviderUri, Query.INSERT, rowType);
     }
 
     @NonNull
@@ -68,7 +86,17 @@ public final class Inquiry {
     }
 
     @NonNull
+    public <RowType> Query<RowType> update(@NonNull Uri contentProviderUri, @NonNull Class<RowType> rowType) {
+        return new Query<>(this, contentProviderUri, Query.UPDATE, rowType);
+    }
+
+    @NonNull
     public <RowType> Query<RowType> deleteFrom(@NonNull String table, @NonNull Class<RowType> rowType) {
         return new Query<>(this, table, Query.DELETE, rowType);
+    }
+
+    @NonNull
+    public <RowType> Query<RowType> deleteFrom(@NonNull Uri contentProviderUri, @NonNull Class<RowType> rowType) {
+        return new Query<>(this, contentProviderUri, Query.DELETE, rowType);
     }
 }
