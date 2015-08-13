@@ -1,8 +1,8 @@
 # Inquiry
 
-Inquiry is a simple library for Android that simplifies construction and use of SQLite databases.
+Inquiry is a simple library for Android that makes construction and use of SQLite databases super easy.
 
-Simply and efficiently read and write class objects from tables in a database. Let Inquiry handle the heavy lifting.
+Read and write class objects from tables in a database. Let Inquiry handle the heavy lifting.
 
 ---
 
