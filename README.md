@@ -111,11 +111,12 @@ annotation, they will be ignored by Inquiry.
 
 Notice that the `_id` field contains optional parameters in its annotation:
 
-* `primaryKey` indicates its column is the main column used to identity the row. No other row in the
-table can have the same value for that column. This is commonly used with IDs.
+* `primaryKey` indicates its column is the main column used to identify the row. No other row in the
+table can have the same value for that specific column. This is commonly used with IDs.
 * `notNull` indicates that you can never insert null as a value for that column.
-* `autoIncrement` indicates that you don't need to manually set the value of this column. Every time
-you insert a row into the table, this column will be incremented by one automatically.
+* `autoIncrement` indicates that you don't manually set the value of this column. Every time
+you insert a row into the table, this column will be incremented by one automatically. This can
+only be used with INTEGER columns (short, int, or long fields), however.
 
 ---
 
