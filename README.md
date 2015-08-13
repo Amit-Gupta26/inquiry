@@ -55,7 +55,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Inquiry.init(this, "myDatabase);
+        Inquiry.init(this, "myDatabase");
     }
 
     @Override
