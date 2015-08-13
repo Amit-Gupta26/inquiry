@@ -1,24 +1,8 @@
 # Inquiry
 
-Inquiry is a simple library for Android that simplifies construction and use of SQL content providers.
+Inquiry is a simple library for Android that simplifies construction and use of SQLite databases.
 
-#### What's SQL?
-
-*Structured Query Language* is a simple to understand command language used to manipulate databases.
-There are many variations, owned by different companies. MySQL and PostgreSQL being examples.
-
-#### What's SQLite?
-
-*SQLite* is a "dumbed down" version of SQL. SQLite is accessed directly through a file, rather than over
-a network connection (which is actually safer and faster). Unnecessary commands, functions, and data types
-were removed from SQLite.
-
-#### What's a Content Provider?
-
-A *content provider* is an Android API used to store data that can be used across processes and apps.
-Content providers are accessed via `content://` URIs. This library takes advantage of SQLite functionality
-that can be accessed through content providers, to quickly and efficiently store mass amounts of structured
-information.
+Simply and efficiently read and write class objects from tables in a database. Let Inquiry handle the heavy lifting.
 
 ---
 
